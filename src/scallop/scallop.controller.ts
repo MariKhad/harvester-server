@@ -1,0 +1,35 @@
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ScallopService } from './scallop.service';
+
+ApiTags('Scallop');
+@Controller('scallop')
+export class ScallopController {
+  constructor(private readonly scallopService: ScallopService) {}
+
+  @ApiOperation({ summary: 'Show all scallop pools' })
+  @Get('pools')
+  async getPools() {
+    return await this.scallopService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all scallop tokens' })
+  @Get('tokens')
+  async getTokens() {
+    return await this.scallopService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show user portfolio on scallop by address' })
+  @Get('balance/:address')
+  @ApiParam({
+    name: 'address',
+    type: 'string',
+    description: 'User address',
+    example:
+      '0x298d88a5819930540d10503ca722c2a82d431bf0b36391b84a11079f925412fa', // Пример дефолтного адреса
+    required: false,
+  })
+  async getUserBalance(@Param('address') address: string) {
+    return await this.scallopService.getUserBalance(address);
+  }
+}
