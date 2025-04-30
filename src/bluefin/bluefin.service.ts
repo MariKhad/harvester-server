@@ -16,7 +16,7 @@ export class BluefinService {
   async getAllPools(): Promise<any[]> {
     try {
       const { data } = await axios.get(
-        process.env['BLUEFIN_URL'] + '/pools/info',
+        'https://swap.api.sui-prod.bluefin.io/api/v1/pools/info',
       );
 
       const serializedPoolData = data.map((item) => SerializeObject(item));
@@ -29,7 +29,7 @@ export class BluefinService {
   async getAllTokens(): Promise<any[]> {
     try {
       const { data } = await axios.get(
-        process.env['BLUEFIN_URL'] + '/tokens/info',
+        'https://swap.api.sui-prod.bluefin.io/api/v1/tokens/info',
       );
 
       const serializedTokenData = data.map((item) => SerializeObject(item));
