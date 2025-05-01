@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MmtSDK } from '@mmt-finance/clmm-sdk';
+import IsTokenStable from 'src/utils/IsTokenStable';
 
 @Injectable()
 export class MomentumService {
@@ -12,7 +13,14 @@ export class MomentumService {
   async getAllPools(): Promise<any[]> {
     try {
       const marketData = await this.mmtSDK.Pool.getAllPools();
-      return marketData;
+      const stablePools = marketData.filter((pool) => {
+        const tokenXTicker = pool.tokenX?.ticker.toUpperCase();
+        const tokenYTicker = pool.tokenY?.ticker.toUpperCase();
+        const usdMatch =
+          tokenXTicker.includes('USD') && tokenYTicker.includes('USD');
+        return usdMatch;
+      });
+      return stablePools;
     } catch (error) {
       console.error('Error in MomentumService.getAllPools():', error);
       return [];
@@ -25,6 +33,25 @@ export class MomentumService {
       return marketData;
     } catch (error) {
       console.error('Error in MomentumService.getAllTokens():', error);
+      return [];
+    }
+  }
+
+  async getAllTokenPools(token: string): Promise<string | any> {
+    try {
+      if (!IsTokenStable(token)) {
+        return 'This token is not supported.';
+      }
+      const formatToken = token.toUpperCase();
+      const poolsData = this.getAllPools();
+      const tokenPoolsData = (await poolsData).filter((pool) => {
+        const tokenXTicker = pool.tokenX?.ticker.toUpperCase();
+        const tokenYTicker = pool.tokenY?.ticker.toUpperCase();
+        return tokenXTicker === formatToken || tokenYTicker === formatToken;
+      });
+      return tokenPoolsData;
+    } catch (error) {
+      console.error('Error in ScallopService.getAllTokenPools():', error);
       return [];
     }
   }

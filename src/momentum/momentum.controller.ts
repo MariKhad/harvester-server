@@ -7,10 +7,23 @@ ApiTags('Momentum');
 export class MomentumController {
   constructor(private readonly momentumService: MomentumService) {}
 
-  @ApiOperation({ summary: 'Show all momentum pools' })
+  @ApiOperation({ summary: 'Show all momentum pools on stables' })
   @Get('pools')
   async getPools() {
     return await this.momentumService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all Momentum pools for stable coin' })
+  @Get('pools/:token')
+  @ApiParam({
+    name: 'token',
+    type: 'string',
+    description: 'token',
+    example: 'usdc',
+    required: false,
+  })
+  async getTokenPools(@Param('token') token: string) {
+    return await this.momentumService.getAllTokenPools(token);
   }
 
   @ApiOperation({ summary: 'Show all momentum tokens' })

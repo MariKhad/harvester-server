@@ -7,10 +7,23 @@ import { BluefinService } from './bluefin.service';
 export class BluefinController {
   constructor(private readonly bluefinService: BluefinService) {}
 
-  @ApiOperation({ summary: 'Show all Bluefin pools' })
+  @ApiOperation({ summary: 'Show all Bluefin pools on stables' })
   @Get('pools')
   async getPools() {
     return await this.bluefinService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all Bluefin pools for stable coin' })
+  @Get('pools/:token')
+  @ApiParam({
+    name: 'token',
+    type: 'string',
+    description: 'token',
+    example: 'usdc',
+    required: false,
+  })
+  async getTokenPools(@Param('token') token: string) {
+    return await this.bluefinService.getAllTokenPools(token);
   }
 
   @ApiOperation({ summary: 'Show all Bluefin tokens' })

@@ -4,6 +4,7 @@ import SerializeObject from 'src/utils/Serialize';
 import { QueryChain } from '@firefly-exchange/library-sui/dist/src/spot';
 import { mainnet } from '../../config';
 import { SuiClient } from '@firefly-exchange/library-sui';
+import IsTokenStable from 'src/utils/IsTokenStable';
 
 @Injectable()
 export class BluefinService {
@@ -20,12 +21,42 @@ export class BluefinService {
       );
 
       const serializedPoolData = data.map((item) => SerializeObject(item));
-      return serializedPoolData;
+      const stablePoolsData = serializedPoolData.filter((pool) => {
+        const [token1, token2] = pool.symbol.split('/');
+        const usdMatch = token1.includes('USD') && token2.includes('USD');
+        return usdMatch;
+      });
+      return stablePoolsData;
     } catch (error) {
       console.error('Error in BluefinService.getAllPools():', error);
       return [];
     }
   }
+
+  async getAllTokenPools(token: string): Promise<string | any[]> {
+    console.log('token: ', token);
+    try {
+      if (!IsTokenStable) {
+        return 'This token is not supported.';
+      }
+      const formatToken = token.toUpperCase();
+      const poolsData = await this.getAllPools();
+      const tokenPoolsData = poolsData.filter((pool) => {
+        const [token1, token2] = pool.symbol.split('/');
+
+        const tokenMatch =
+          token1.toUpperCase() === formatToken ||
+          token2.toUpperCase() === formatToken;
+        const usdMatch = token1.includes('USD') && token2.includes('USD');
+        return tokenMatch && usdMatch;
+      });
+      return tokenPoolsData;
+    } catch (error) {
+      console.error('Error in BluefinService.getAllTokenPools():', error);
+      return [];
+    }
+  }
+
   async getAllTokens(): Promise<any[]> {
     try {
       const { data } = await axios.get(

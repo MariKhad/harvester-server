@@ -7,10 +7,23 @@ ApiTags('Scallop');
 export class ScallopController {
   constructor(private readonly scallopService: ScallopService) {}
 
-  @ApiOperation({ summary: 'Show all scallop pools' })
+  @ApiOperation({ summary: 'Show all scallop pools on stables' })
   @Get('pools')
   async getPools() {
     return await this.scallopService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all Scallop pools for a stable coin' })
+  @Get('pools/:token')
+  @ApiParam({
+    name: 'token',
+    type: 'string',
+    description: 'token',
+    example: 'usdc',
+    required: false,
+  })
+  async getTokenPools(@Param('token') token: string) {
+    return await this.scallopService.getAllTokenPools(token);
   }
 
   @ApiOperation({ summary: 'Show all scallop tokens' })
