@@ -10,7 +10,7 @@ export class ScallopController {
   @ApiOperation({ summary: 'Show all scallop pools on stables' })
   @Get('pools')
   async getPools() {
-    return await this.scallopService.getAllPools();
+    return await this.scallopService.getAllStablePools();
   }
 
   @ApiOperation({ summary: 'Show all Scallop pools for a stable coin' })
@@ -29,7 +29,7 @@ export class ScallopController {
   @ApiOperation({ summary: 'Show all scallop tokens' })
   @Get('tokens')
   async getTokens() {
-    return await this.scallopService.getAllPools();
+    return await this.scallopService.getAllStablePools();
   }
 
   @ApiOperation({ summary: 'Show user portfolio on scallop by address' })

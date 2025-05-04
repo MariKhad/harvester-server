@@ -29,7 +29,7 @@ export class BluefinController {
   @ApiOperation({ summary: 'Show all Bluefin tokens' })
   @Get('tokens')
   async getTokens() {
-    return await this.bluefinService.getAllPools();
+    return await this.bluefinService.getAllTokens();
   }
 
   @ApiOperation({ summary: 'Show user portfolio on Bluefin by address' })

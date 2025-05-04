@@ -1,7 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { BluefinService } from './bluefin/bluefin.service';
 
 @ApiTags('Root')
 @Controller()

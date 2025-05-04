@@ -14,7 +14,7 @@ export class ScallopService {
 
   async onModuleInit() {
     await this.initializedScallopQuery();
-    await this.getAllPools();
+    await this.getAllStablePools();
   }
 
   async initializedScallopQuery() {
@@ -45,6 +45,39 @@ export class ScallopService {
         return stablePools;
       } else {
         const cashData = await readJsonFromFile(
+          './src/scallop/scallop-usd.cash.json',
+        );
+        return cashData;
+      }
+    } catch (error) {
+      console.error('Error in ScallopService.getAllPools():', error);
+      const cashData = await readJsonFromFile(
+        './src/scallop/scallop-usd.cash.json',
+      );
+      return cashData;
+    }
+  }
+
+  async getAllStablePools(): Promise<any> {
+    try {
+      const marketData = await this.scallopQuery.getMarketPools();
+      const stablePools = {};
+      if (marketData && marketData.pools) {
+        for (const poolKey in marketData.pools) {
+          if (marketData.pools.hasOwnProperty(poolKey)) {
+            if (poolKey.toLowerCase().includes('usd')) {
+              stablePools[poolKey] = marketData.pools[poolKey];
+            }
+          }
+        }
+
+        await writeJsonToFile(
+          './src/scallop/scallop-usd.cash.json',
+          marketData,
+        );
+        return stablePools;
+      } else {
+        const cashData = await readJsonFromFile(
           './src/scallop/scallop.cash.json',
         );
         return cashData;
@@ -58,7 +91,7 @@ export class ScallopService {
     }
   }
 
-  async getAllTokenPools(token: string): Promise<string | any> {
+  async getAllStableTokenPools(token: string): Promise<string | any> {
     try {
       if (!IsTokenStable(token)) {
         return 'This token is not supported.';
@@ -66,18 +99,18 @@ export class ScallopService {
       const tokenPoolsData = await this.scallopQuery.getMarketPool(token);
 
       if (!tokenPoolsData) {
-        return await this.getTokenPoolsFromCash(token);
+        return await this.getTokenStablePoolsFromCash(token);
       }
 
       return tokenPoolsData;
     } catch (error) {
       console.error('Error in ScallopService.getAllTokenPools():', error);
-      return await this.getTokenPoolsFromCash(token);
+      return await this.getTokenStablePoolsFromCash(token);
     }
   }
 
-  async getTokenPoolsFromCash(token: string) {
-    const marketData = await this.getAllPools();
+  async getTokenStablePoolsFromCash(token: string) {
+    const marketData = await this.getAllStablePools();
     const stableTokenPools = {};
     if (marketData && marketData.pools) {
       for (const poolKey in marketData.pools) {

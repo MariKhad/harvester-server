@@ -18,7 +18,7 @@ export class AppService {
 
   async getAllPools(): Promise<any> {
     const bluefinPools = await this.bluefinService.getAllPools();
-    const scallopPools = await this.scallopService.getAllPools();
+    const scallopPools = await this.scallopService.getAllStablePools();
     const momentumPools = await this.momentumService.getAllPools();
     return {
       scallop: { ...scallopPools },
