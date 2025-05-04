@@ -10,14 +10,14 @@ export class MomentumService {
     this.mmtSDK = mmtSDK;
   }
 
-  async getAllPools(): Promise<any[]> {
+  async getAllStablePools(): Promise<any[]> {
     try {
       const marketData = await this.mmtSDK.Pool.getAllPools();
       const stablePools = marketData.filter((pool) => {
         const tokenXTicker = pool.tokenX?.ticker.toUpperCase();
         const tokenYTicker = pool.tokenY?.ticker.toUpperCase();
         const usdMatch =
-          tokenXTicker.includes('USD') && tokenYTicker.includes('USD');
+          IsTokenStable(tokenXTicker) && IsTokenStable(tokenYTicker);
         return usdMatch;
       });
       return stablePools;
@@ -37,13 +37,13 @@ export class MomentumService {
     }
   }
 
-  async getAllTokenPools(token: string): Promise<string | any> {
+  async getAllStablePoolsByToken(token: string): Promise<string | any> {
     try {
       if (!IsTokenStable(token)) {
         return 'This token is not supported.';
       }
       const formatToken = token.toUpperCase();
-      const poolsData = this.getAllPools();
+      const poolsData = this.getAllStablePools();
       const tokenPoolsData = (await poolsData).filter((pool) => {
         const tokenXTicker = pool.tokenX?.ticker.toUpperCase();
         const tokenYTicker = pool.tokenY?.ticker.toUpperCase();

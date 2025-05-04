@@ -1,5 +1,5 @@
 function IsTokenStable(token: string): boolean {
-  return token.toLowerCase().includes('usd');
+  return token.toUpperCase().includes('USD') || token === 'BUCK';
 }
 
 export default IsTokenStable;

@@ -65,7 +65,7 @@ export class ScallopService {
       if (marketData && marketData.pools) {
         for (const poolKey in marketData.pools) {
           if (marketData.pools.hasOwnProperty(poolKey)) {
-            if (poolKey.toLowerCase().includes('usd')) {
+            if (IsTokenStable(poolKey)) {
               stablePools[poolKey] = marketData.pools[poolKey];
             }
           }
@@ -78,20 +78,20 @@ export class ScallopService {
         return stablePools;
       } else {
         const cashData = await readJsonFromFile(
-          './src/scallop/scallop.cash.json',
+          './src/scallop/scallop-usd.cash.json',
         );
         return cashData;
       }
     } catch (error) {
       console.error('Error in ScallopService.getAllPools():', error);
       const cashData = await readJsonFromFile(
-        './src/scallop/scallop.cash.json',
+        './src/scallop/scallop-usd.cash.json',
       );
       return cashData;
     }
   }
 
-  async getAllStableTokenPools(token: string): Promise<string | any> {
+  async getAllStablePoolsByToken(token: string): Promise<string | any> {
     try {
       if (!IsTokenStable(token)) {
         return 'This token is not supported.';
@@ -135,13 +135,14 @@ export class ScallopService {
   }
 
   async getUserBalance(address: string): Promise<any> {
-    const balance = await this.scallopQuery.getUserPortfolio({
-      walletAddress: address,
-    });
-    return balance;
-  }
-  catch(error) {
-    console.error('Error in ScallopService.getUserBalance():', error);
-    return [];
+    try {
+      const balance = await this.scallopQuery.getUserPortfolio({
+        walletAddress: address,
+      });
+      return balance;
+    } catch (error) {
+      console.error('Error in ScallopService.getUserBalance():', error);
+      return [];
+    }
   }
 }

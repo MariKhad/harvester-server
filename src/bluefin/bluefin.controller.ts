@@ -8,13 +8,13 @@ export class BluefinController {
   constructor(private readonly bluefinService: BluefinService) {}
 
   @ApiOperation({ summary: 'Show all Bluefin pools on stables' })
-  @Get('pools')
-  async getPools() {
-    return await this.bluefinService.getAllPools();
+  @Get('stables')
+  async getStablePools() {
+    return await this.bluefinService.getAllStablePools();
   }
 
   @ApiOperation({ summary: 'Show all Bluefin pools for stable coin' })
-  @Get('pools/:token')
+  @Get('stables/:token')
   @ApiParam({
     name: 'token',
     type: 'string',
@@ -22,8 +22,8 @@ export class BluefinController {
     example: 'usdc',
     required: false,
   })
-  async getTokenPools(@Param('token') token: string) {
-    return await this.bluefinService.getAllTokenPools(token);
+  async getStablePoolsByToken(@Param('token') token: string) {
+    return await this.bluefinService.getAllStablePoolsByToken(token);
   }
 
   @ApiOperation({ summary: 'Show all Bluefin tokens' })

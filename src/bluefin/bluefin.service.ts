@@ -14,7 +14,7 @@ export class BluefinService {
     this.client = client;
   }
 
-  async getAllPools(): Promise<any[]> {
+  async getAllStablePools(): Promise<any[]> {
     try {
       const { data } = await axios.get(
         'https://swap.api.sui-prod.bluefin.io/api/v1/pools/info',
@@ -23,7 +23,7 @@ export class BluefinService {
       const serializedPoolData = data.map((item) => SerializeObject(item));
       const stablePoolsData = serializedPoolData.filter((pool) => {
         const [token1, token2] = pool.symbol.split('/');
-        const usdMatch = token1.includes('USD') && token2.includes('USD');
+        const usdMatch = IsTokenStable(token1) && IsTokenStable(token2);
         return usdMatch;
       });
       return stablePoolsData;
@@ -33,22 +33,20 @@ export class BluefinService {
     }
   }
 
-  async getAllTokenPools(token: string): Promise<string | any[]> {
-    console.log('token: ', token);
+  async getAllStablePoolsByToken(token: string): Promise<string | any[]> {
     try {
       if (!IsTokenStable) {
         return 'This token is not supported.';
       }
       const formatToken = token.toUpperCase();
-      const poolsData = await this.getAllPools();
+      const poolsData = await this.getAllStablePools();
       const tokenPoolsData = poolsData.filter((pool) => {
         const [token1, token2] = pool.symbol.split('/');
 
         const tokenMatch =
           token1.toUpperCase() === formatToken ||
           token2.toUpperCase() === formatToken;
-        const usdMatch = token1.includes('USD') && token2.includes('USD');
-        return tokenMatch && usdMatch;
+        return tokenMatch;
       });
       return tokenPoolsData;
     } catch (error) {

@@ -8,13 +8,13 @@ export class MomentumController {
   constructor(private readonly momentumService: MomentumService) {}
 
   @ApiOperation({ summary: 'Show all momentum pools on stables' })
-  @Get('pools')
-  async getPools() {
-    return await this.momentumService.getAllPools();
+  @Get('stables')
+  async getStablePools() {
+    return await this.momentumService.getAllStablePools();
   }
 
   @ApiOperation({ summary: 'Show all Momentum pools for stable coin' })
-  @Get('pools/:token')
+  @Get('stables/:token')
   @ApiParam({
     name: 'token',
     type: 'string',
@@ -22,14 +22,14 @@ export class MomentumController {
     example: 'usdc',
     required: false,
   })
-  async getTokenPools(@Param('token') token: string) {
-    return await this.momentumService.getAllTokenPools(token);
+  async getStablePoolsByToken(@Param('token') token: string) {
+    return await this.momentumService.getAllStablePoolsByToken(token);
   }
 
   @ApiOperation({ summary: 'Show all momentum tokens' })
   @Get('tokens')
   async getTokens() {
-    return await this.momentumService.getAllPools();
+    return await this.momentumService.getAllStablePools();
   }
 
   @ApiOperation({ summary: 'Show user portfolio on momentum by address' })
