@@ -16,7 +16,7 @@ export class ScallopService {
 
   async onModuleInit() {
     await this.initializedScallopQuery();
-    await this.getAllPools();
+    //await this.getAllPools();
   }
 
   async initializedScallopQuery() {
