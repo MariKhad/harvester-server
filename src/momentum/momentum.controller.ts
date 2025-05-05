@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { MomentumService } from './momentum.service';
 
@@ -7,13 +7,27 @@ ApiTags('Momentum');
 export class MomentumController {
   constructor(private readonly momentumService: MomentumService) {}
 
+  @ApiOperation({ summary: 'Show all Momentum pools, not formated' })
+  @Get('no-format')
+  async getAllPools() {
+    return await this.momentumService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all Momentum pools' })
+  @Get('pools')
+  async getAllFormatPools(@Query('search') search: string) {
+    return await this.momentumService.getAllFormatPools(search);
+  }
+
   @ApiOperation({ summary: 'Show all momentum pools on stables' })
   @Get('stables')
   async getStablePools() {
     return await this.momentumService.getAllStablePools();
   }
 
-  @ApiOperation({ summary: 'Show all Momentum pools for stable coin' })
+  @ApiOperation({
+    summary: 'Show all Momentum pools for a particular stable coin',
+  })
   @Get('stables/:token')
   @ApiParam({
     name: 'token',
@@ -29,7 +43,7 @@ export class MomentumController {
   @ApiOperation({ summary: 'Show all momentum tokens' })
   @Get('tokens')
   async getTokens() {
-    return await this.momentumService.getAllStablePools();
+    return await this.momentumService.getAllTokens();
   }
 
   @ApiOperation({ summary: 'Show user portfolio on momentum by address' })

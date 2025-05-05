@@ -1,6 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MmtSDK } from '@mmt-finance/clmm-sdk';
 import IsTokenStable from 'src/utils/IsTokenStable';
+import Pool from 'src/struct/IFormatPool';
+import {
+  ExtendedPoolWithApr,
+  TokenSchema,
+} from '@mmt-finance/clmm-sdk/dist/types';
+import { SearchFilter } from 'src/utils/SearchFilter';
 
 @Injectable()
 export class MomentumService {
@@ -10,14 +16,37 @@ export class MomentumService {
     this.mmtSDK = mmtSDK;
   }
 
-  async getAllStablePools(): Promise<any[]> {
+  async getAllPools() {
+    const marketData = await this.mmtSDK.Pool.getAllPools();
+    return marketData;
+  }
+
+  async getAllFormatPools(search?: string): Promise<any[]> {
     try {
       const marketData = await this.mmtSDK.Pool.getAllPools();
+      const formatData: Pool[] = await Promise.all(
+        marketData.map((pool) =>
+          this.processPool(
+            pool,
+            this.rewardCoin.bind(this),
+            this.getTokenByTicker.bind(this),
+            this.calculateDailyReward.bind(this),
+          ),
+        ),
+      );
+      return search ? SearchFilter(formatData, search) : formatData;
+    } catch (error) {
+      console.error('Error in MomentumService.getAllPools():', error);
+      return [];
+    }
+  }
+
+  async getAllStablePools(): Promise<any[]> {
+    try {
+      const marketData = await this.getAllFormatPools();
       const stablePools = marketData.filter((pool) => {
-        const tokenXTicker = pool.tokenX?.ticker.toUpperCase();
-        const tokenYTicker = pool.tokenY?.ticker.toUpperCase();
-        const usdMatch =
-          IsTokenStable(tokenXTicker) && IsTokenStable(tokenYTicker);
+        const { token1, token2 } = pool;
+        const usdMatch = IsTokenStable(token1) && IsTokenStable(token2);
         return usdMatch;
       });
       return stablePools;
@@ -27,10 +56,24 @@ export class MomentumService {
     }
   }
 
-  async getAllTokens(): Promise<any[]> {
+  async getAllTokens(): Promise<TokenSchema[]> {
+    try {
+      const marketData = await this.getAllTokens();
+      return marketData;
+    } catch (error) {
+      console.error('Error in MomentumService.getAllTokens():', error);
+      return [];
+    }
+  }
+
+  async getTokenByTicker(ticker: string): Promise<TokenSchema[]> {
     try {
       const marketData = await this.mmtSDK.Pool.getAllTokens();
-      return marketData;
+      const result = marketData.filter((token) => {
+        return token.ticker === ticker;
+      });
+
+      return result;
     } catch (error) {
       console.error('Error in MomentumService.getAllTokens():', error);
       return [];
@@ -45,9 +88,8 @@ export class MomentumService {
       const formatToken = token.toUpperCase();
       const poolsData = this.getAllStablePools();
       const tokenPoolsData = (await poolsData).filter((pool) => {
-        const tokenXTicker = pool.tokenX?.ticker.toUpperCase();
-        const tokenYTicker = pool.tokenY?.ticker.toUpperCase();
-        return tokenXTicker === formatToken || tokenYTicker === formatToken;
+        const { token1, token2 } = pool;
+        return token1 === formatToken || token2 === formatToken;
       });
       return tokenPoolsData;
     } catch (error) {
@@ -64,5 +106,77 @@ export class MomentumService {
       console.error('Error in MomentumService.getUserBalance():', error);
       return [];
     }
+  }
+
+  rewardCoin = (str: string) => {
+    const parts = str.split('::');
+    return parts.length < 3 ? null : parts.pop()?.match(/[A-Z]+/)?.[0] || null;
+  };
+
+  calculateDailyReward(data: any, decimals: number): string | null {
+    if (!data.flow_rate || !data.reward_amount) {
+      return null;
+    }
+
+    const flowRate = BigInt(data?.flow_rate);
+    const rewardAmount = Number(data?.reward_amount);
+    const secondsInDay = 86400;
+    const scaleFactor = BigInt(1000000); // Scale to 6 decimal places of precision
+
+    const numerator = flowRate * BigInt(secondsInDay) * scaleFactor;
+    const denominator = BigInt(10) ** BigInt(decimals) * BigInt(rewardAmount);
+    const amountPerDayScaled = Number(numerator / denominator);
+
+    const amountPerDay = amountPerDayScaled / Number(scaleFactor);
+
+    return `${amountPerDay / 10000000000} per day`;
+  }
+
+  async processPool(
+    pool: any,
+    rewardCoin: (coinType: string) => string,
+    getTokenByTicker: (ticker: string) => Promise<any>,
+    calculateDailyReward: (rewarder: any, decimals: number) => string | null,
+  ): Promise<Pool> {
+    let reward1: IReward = {};
+    let reward2: IReward = {};
+
+    if (pool.rewarders && pool.rewarders[0]) {
+      const reward1_name = rewardCoin(pool.rewarders[0]?.coin_type);
+      const reward1_token = await getTokenByTicker(reward1_name);
+      reward1.decimals = reward1_token[0]?.decimals;
+      reward1.apr = reward1.decimals
+        ? calculateDailyReward(pool.rewarders[0], reward1.decimals)
+        : null;
+      reward1.hasEnded = pool.rewarders[0].hasEnded;
+      reward1.name = reward1_name;
+    }
+
+    if (pool.rewarders && pool.rewarders[1]) {
+      const reward2_name = rewardCoin(pool.rewarders[1]?.coin_type);
+      const reward2_token = await getTokenByTicker(reward2_name);
+      reward2.decimals = reward2_token[0]?.decimals;
+      reward2.apr = reward2.decimals
+        ? calculateDailyReward(pool.rewarders[1], reward2.decimals)
+        : null;
+      reward2.hasEnded = pool.rewarders[1].hasEnded;
+      reward2.name = reward2_name;
+    }
+
+    return {
+      pool_id: pool?.poolId,
+      token1: pool?.tokenX.ticker,
+      token2: pool?.tokenY.ticker || null,
+      total_apr: pool?.aprBreakdown.total,
+      reward1: reward1.hasEnded ? null : reward1.name || null,
+      reward2: reward2.hasEnded ? null : reward2.name || null,
+      reward1_apr: reward1.apr || null,
+      reward2_apr: reward2.apr || null,
+      protocol: 'momentum',
+      type: pool?.tokenY.name ? 'il' : 'lend',
+      tvl: pool.tvl,
+      volume_24: pool.volume24h,
+      fees_24: pool.fees24h,
+    };
   }
 }

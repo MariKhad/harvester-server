@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { BluefinService } from './bluefin.service';
 
@@ -7,13 +7,27 @@ import { BluefinService } from './bluefin.service';
 export class BluefinController {
   constructor(private readonly bluefinService: BluefinService) {}
 
+  @ApiOperation({ summary: 'Show all Bluefin pools, not formated' })
+  @Get('no-format')
+  async getAllPools() {
+    return await this.bluefinService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all Bluefin pools' })
+  @Get('pools')
+  async getAllFormatPools(@Query('search') search: string) {
+    return await this.bluefinService.getAllFormatPools(search);
+  }
+
   @ApiOperation({ summary: 'Show all Bluefin pools on stables' })
   @Get('stables')
   async getStablePools() {
     return await this.bluefinService.getAllStablePools();
   }
 
-  @ApiOperation({ summary: 'Show all Bluefin pools for stable coin' })
+  @ApiOperation({
+    summary: 'Show all Bluefin pools for a particular stable coin',
+  })
   @Get('stables/:token')
   @ApiParam({
     name: 'token',

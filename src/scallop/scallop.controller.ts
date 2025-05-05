@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ScallopService } from './scallop.service';
 
@@ -7,13 +7,27 @@ ApiTags('Scallop');
 export class ScallopController {
   constructor(private readonly scallopService: ScallopService) {}
 
+  @ApiOperation({ summary: 'Show all scallop pools, not formated' })
+  @Get('no-format')
+  async getPools() {
+    return await this.scallopService.getAllPools();
+  }
+
+  @ApiOperation({ summary: 'Show all scallop pools' })
+  @Get('pools')
+  async getFormatPools(@Query('search') search: string) {
+    return await this.scallopService.getAllFormatPools(search);
+  }
+
   @ApiOperation({ summary: 'Show all scallop pools on stables' })
   @Get('stables')
   async getStablePools() {
     return await this.scallopService.getAllStablePools();
   }
 
-  @ApiOperation({ summary: 'Show all Scallop pools for a stable coin' })
+  @ApiOperation({
+    summary: 'Show all Scallop pools for a particular stable coin',
+  })
   @Get('stables/:token')
   @ApiParam({
     name: 'token',
