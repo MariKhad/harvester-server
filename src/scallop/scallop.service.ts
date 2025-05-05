@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Scallop, ScallopQuery } from '@scallop-io/sui-scallop-sdk';
-import { readJsonFromFile, writeJsonToFile } from '../utils/FsUtils';
+import { readJsonFromFile, writeJsonToFile } from 'src/utils/FsUtils';
 import IsTokenStable from 'src/utils/IsTokenStable';
 import { SearchFilter } from 'src/utils/SearchFilter';
 import IFormatPool from 'src/struct/IFormatPool';

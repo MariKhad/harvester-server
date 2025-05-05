@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 
-export async function writeJsonToFile(filePath, jsonData) {
+export async function writeJsonToFile(filePath: string, jsonData: any) {
   try {
     const jsonString = JSON.stringify(jsonData, null, 2); // 2 пробела для форматирования
     await fs.writeFile(filePath, jsonString, 'utf-8');
@@ -12,7 +12,7 @@ export async function writeJsonToFile(filePath, jsonData) {
   }
 }
 
-export async function readJsonFromFile(filePath) {
+export async function readJsonFromFile(filePath: string) {
   try {
     const data = await fs.readFile(filePath, 'utf-8');
     const jsonData = JSON.parse(data);
