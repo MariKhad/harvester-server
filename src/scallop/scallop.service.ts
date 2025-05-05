@@ -35,22 +35,22 @@ export class ScallopService {
       const marketData = await this.scallopQuery.getMarketPools();
 
       if (marketData && marketData.pools) {
-        await writeJsonToFile('./src/scallop/scallop.cash.json', marketData);
+        // await writeJsonToFile('./src/scallop/scallop.cash.json', marketData);
 
         return marketData;
       } else {
-        const cashData = await readJsonFromFile(
+        /*  const cashData = await readJsonFromFile(
           './src/scallop/scallop.cash.json',
-        );
+        ); */
 
-        return cashData;
+        return []; //cashData;
       }
     } catch (error) {
       console.error('Error in ScallopService.getAllPools():', error);
-      const cashData = await readJsonFromFile(
+      /*  const cashData = await readJsonFromFile(
         './src/scallop/scallop.cash.json',
-      );
-      return cashData;
+      ); */
+      return []; // cashData;
     }
   }
 
@@ -59,13 +59,14 @@ export class ScallopService {
       let data;
       const marketData = await this.scallopQuery?.getMarketPools();
       if (marketData && marketData.pools) {
-        await writeJsonToFile('./src/scallop/scallop.cash.json', marketData);
+        //await writeJsonToFile('./src/scallop/scallop.cash.json', marketData);
         data = marketData;
       } else {
-        const cashData = await readJsonFromFile(
+        /*      const cashData = await readJsonFromFile(
           './src/scallop/scallop.cash.json',
         );
-        data = cashData;
+        data = cashData; */
+        return [];
       }
 
       const formatData: IFormatPool[] = [];
@@ -83,7 +84,7 @@ export class ScallopService {
               reward1_apr: null,
               reward2_apr: null,
               protocol: 'scallop',
-              type: 'lend',
+              type: 'lending',
               tvl: pool.supplyAmount,
               volume_24: '',
               fees_24: '',
@@ -95,11 +96,11 @@ export class ScallopService {
       return search ? SearchFilter(formatData, search) : formatData;
     } catch (error) {
       console.error('Error in ScallopService.getAllFormatPools():', error);
-      const cashData = await readJsonFromFile(
+      /*   const cashData = await readJsonFromFile(
         './src/scallop/scallop.cash.json',
-      );
+      ); */
 
-      const formatData: IFormatPool[] = [];
+      /*   const formatData: IFormatPool[] = [];
       if (cashData && cashData.pools) {
         for (const poolName in cashData.pools) {
           if (cashData.pools.hasOwnProperty(poolName)) {
@@ -120,10 +121,9 @@ export class ScallopService {
               fees_24: '',
             };
             formatData.push(formatPool);
-          }
-        }
-        return search ? SearchFilter(formatData, search) : formatData;
-      }
+          } }
+        } */
+      return []; // search ? SearchFilter(formatData, search) : formatData;
     }
   }
 

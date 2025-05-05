@@ -8,7 +8,7 @@ interface IFormatPool {
   reward1_apr: string | null;
   reward2_apr: string | null;
   protocol: string;
-  type: 'il' | 'lend';
+  type: 'impermanent loss' | 'lending';
   tvl: string | number;
   volume_24: string;
   fees_24: string;

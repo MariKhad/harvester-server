@@ -62,7 +62,7 @@ export class BluefinService {
           reward1_apr: reward1 ? pool?.day?.apr?.rewardApr : null,
           reward2_apr: null,
           protocol: 'bluefin',
-          type: pool?.tokenB?.info?.symbol ? 'il' : 'lend',
+          type: pool?.tokenB?.info?.symbol ? 'impermanent loss' : 'lending',
           tvl: pool?.tvl ?? null,
           volume_24: pool?.day?.volume ?? null,
           fees_24: pool?.day?.fee ?? null,

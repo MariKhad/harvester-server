@@ -15,6 +15,13 @@ export class AppController {
 
   @ApiOperation({ summary: 'Show all pools' })
   @Get('/pools')
+  @ApiParam({
+    name: 'search',
+    type: 'string',
+    description: 'query string',
+    example: 'su',
+    required: false,
+  })
   async getAllFormatPools(@Query('search') search: string): Promise<any> {
     const pools = await this.appService.getAllFormatPools(search);
     return pools;
