@@ -15,13 +15,6 @@ export class MomentumController {
 
   @ApiOperation({ summary: 'Show all Momentum pools' })
   @Get('pools')
-  @ApiParam({
-    name: 'search',
-    type: 'string',
-    description: 'query string',
-    example: 'su',
-    required: false,
-  })
   async getAllFormatPools(@Query('search') search: string) {
     return await this.momentumService.getAllFormatPools(search);
   }
