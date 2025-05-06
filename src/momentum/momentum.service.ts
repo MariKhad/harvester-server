@@ -2,10 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MmtSDK } from '@mmt-finance/clmm-sdk';
 import IsTokenStable from 'src/utils/IsTokenStable';
 import Pool from 'src/struct/IFormatPool';
-import {
-  ExtendedPoolWithApr,
-  TokenSchema,
-} from '@mmt-finance/clmm-sdk/dist/types';
+import { TokenSchema } from '@mmt-finance/clmm-sdk/dist/types';
 import { SearchFilter } from 'src/utils/SearchFilter';
 
 @Injectable()
@@ -30,7 +27,6 @@ export class MomentumService {
             pool,
             this.rewardCoin.bind(this),
             this.getTokenByTicker.bind(this),
-            this.calculateDailyReward.bind(this),
           ),
         ),
       );
@@ -113,30 +109,10 @@ export class MomentumService {
     return parts.length < 3 ? null : parts.pop()?.match(/[A-Z]+/)?.[0] || null;
   };
 
-  calculateDailyReward(data: any, decimals: number): string | null {
-    if (!data.flow_rate || !data.reward_amount) {
-      return null;
-    }
-
-    const flowRate = BigInt(data?.flow_rate);
-    const rewardAmount = Number(data?.reward_amount);
-    const secondsInDay = 86400;
-    const scaleFactor = BigInt(1000000); // Scale to 6 decimal places of precision
-
-    const numerator = flowRate * BigInt(secondsInDay) * scaleFactor;
-    const denominator = BigInt(10) ** BigInt(decimals) * BigInt(rewardAmount);
-    const amountPerDayScaled = Number(numerator / denominator);
-
-    const amountPerDay = amountPerDayScaled / Number(scaleFactor);
-
-    return `${amountPerDay / 10000000000} per day`;
-  }
-
   async processPool(
     pool: any,
     rewardCoin: (coinType: string) => string,
     getTokenByTicker: (ticker: string) => Promise<any>,
-    calculateDailyReward: (rewarder: any, decimals: number) => string | null,
   ): Promise<Pool> {
     let reward1: IReward = {};
     let reward2: IReward = {};
@@ -145,9 +121,7 @@ export class MomentumService {
       const reward1_name = rewardCoin(pool.rewarders[0]?.coin_type);
       const reward1_token = await getTokenByTicker(reward1_name);
       reward1.decimals = reward1_token[0]?.decimals;
-      reward1.apr = reward1.decimals
-        ? calculateDailyReward(pool.rewarders[0], reward1.decimals)
-        : null;
+      reward1.apr = reward1.decimals ? pool.aprBreakdown.rewards[0].apr : null;
       reward1.hasEnded = pool.rewarders[0].hasEnded;
       reward1.name = reward1_name;
     }
@@ -156,9 +130,7 @@ export class MomentumService {
       const reward2_name = rewardCoin(pool.rewarders[1]?.coin_type);
       const reward2_token = await getTokenByTicker(reward2_name);
       reward2.decimals = reward2_token[0]?.decimals;
-      reward2.apr = reward2.decimals
-        ? calculateDailyReward(pool.rewarders[1], reward2.decimals)
-        : null;
+      reward2.apr = reward2.decimals ? pool.aprBreakdown.rewards[1].apr : null;
       reward2.hasEnded = pool.rewarders[1].hasEnded;
       reward2.name = reward2_name;
     }
@@ -173,7 +145,7 @@ export class MomentumService {
       reward1_apr: reward1.apr || null,
       reward2_apr: reward2.apr || null,
       protocol: 'momentum',
-      type: pool?.tokenY.name ? 'il' : 'lend',
+      type: pool?.tokenY.name ? 'impermanent loss' : 'lending',
       tvl: pool.tvl,
       volume_24: pool.volume24h,
       fees_24: pool.fees24h,
