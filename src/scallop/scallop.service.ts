@@ -114,7 +114,7 @@ export class ScallopService {
               reward1_apr: null,
               reward2_apr: null,
               protocol: 'scallop',
-              type: 'lend',
+              type: 'lending',
               tvl: pool.supplyAmount,
               volume_24: '',
               fees_24: '',
