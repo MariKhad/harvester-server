@@ -70,7 +70,7 @@ export class ScallopService {
 
       const formatData: IFormatPool[] = [];
       if (data && data.pools) {
-        for (const poolName of data.pools) {
+        for (const poolName in data.pools) {
           if (data.pools.hasOwnProperty(poolName)) {
             const pool = data.pools[poolName];
             const formatPool: IFormatPool = {
@@ -101,7 +101,7 @@ export class ScallopService {
 
       const formatData: IFormatPool[] = [];
       if (cashData && cashData.pools) {
-        for (const poolName of cashData.pools) {
+        for (const poolName in cashData.pools) {
           if (cashData.pools.hasOwnProperty(poolName)) {
             const pool = cashData.pools[poolName];
             const formatPool: IFormatPool = {
