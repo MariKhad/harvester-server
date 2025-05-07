@@ -2,8 +2,7 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { NaviService } from './navi.service';
 
-
-@ApiTags('Navi');
+@ApiTags('Navi')
 @Controller('navi')
 export class NaviController {
   constructor(private readonly naviService: NaviService) {}
