@@ -23,7 +23,7 @@ export class AppService {
     const naviPools = await this.naviService.getAllFormatPools(search);
     return {
       scallop: { ...scallopPools },
-      mometum: { ...momentumPools },
+      momentum: { ...momentumPools },
       bluefin: { ...bluefinPools },
       navi: { ...naviPools },
     };

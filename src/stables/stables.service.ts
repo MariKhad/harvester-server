@@ -21,7 +21,7 @@ export class StablesService {
     const naviPools = await this.naviService.getAllStablePools();
     return {
       scallop: { ...scallopPools },
-      mometum: { ...momentumPools },
+      momentum: { ...momentumPools },
       bluefin: { ...bluefinPools },
       navi: { ...naviPools },
     };
@@ -38,7 +38,7 @@ export class StablesService {
     const naviPools = await this.naviService.getAllStablePoolsByToken(token);
     return {
       scallop: { ...scallopPools },
-      mometum: { ...momentumPools },
+      momentum: { ...momentumPools },
       bluefin: { ...bluefinPools },
       navi: { ...naviPools },
     };
