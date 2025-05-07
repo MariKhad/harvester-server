@@ -45,6 +45,7 @@ export class NaviController {
     return await this.naviService.getAllStablePoolsByToken(token);
   }
 
+  //! Не работает
   @ApiOperation({ summary: 'Show all Navi tokens' })
   @Get('tokens')
   async getTokens() {

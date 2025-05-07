@@ -84,6 +84,7 @@ export class NaviService {
     }
   }
 
+  //! Не работает
   async getAllTokens(): Promise<readonly CoinStruct[]> {
     try {
       const marketData = await this.account.getAllCoins();
