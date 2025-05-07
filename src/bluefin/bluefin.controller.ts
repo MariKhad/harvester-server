@@ -15,6 +15,13 @@ export class BluefinController {
 
   @ApiOperation({ summary: 'Show all Bluefin pools' })
   @Get('pools')
+  @ApiParam({
+    name: 'token',
+    type: 'string',
+    description: 'search',
+    example: 'usdc',
+    required: false,
+  })
   async getAllFormatPools(@Query('search') search: string) {
     return await this.bluefinService.getAllFormatPools(search);
   }

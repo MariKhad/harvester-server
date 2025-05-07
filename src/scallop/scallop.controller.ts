@@ -15,6 +15,13 @@ export class ScallopController {
 
   @ApiOperation({ summary: 'Show all scallop pools' })
   @Get('pools')
+  @ApiParam({
+    name: 'token',
+    type: 'string',
+    description: 'search',
+    example: 'usdc',
+    required: false,
+  })
   async getFormatPools(@Query('search') search: string) {
     return await this.scallopService.getAllFormatPools(search);
   }
