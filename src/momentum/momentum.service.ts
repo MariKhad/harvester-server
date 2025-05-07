@@ -87,14 +87,17 @@ export class MomentumService {
 
   async getAllStablePoolsByToken(token: string): Promise<string | any> {
     try {
-      if (!IsTokenStable(token)) {
-        return 'This token is not supported.';
-      }
       const formatToken = token.toUpperCase();
       const poolsData = this.getAllStablePools();
       const tokenPoolsData = (await poolsData).filter((pool) => {
         const { token1, token2 } = pool;
-        return token1 === formatToken || token2 === formatToken;
+        const includesMatch =
+          token1.includes(formatToken) || token2.includes(formatToken);
+
+        const tokenMatch =
+          token1.toUpperCase() === formatToken ||
+          token2.toUpperCase() === formatToken;
+        return tokenMatch || includesMatch;
       });
       return tokenPoolsData;
     } catch (error) {

@@ -94,18 +94,18 @@ export class BluefinService {
 
   async getAllStablePoolsByToken(token: string): Promise<string | any[]> {
     try {
-      if (!IsTokenStable) {
-        return 'This token is not supported.';
-      }
       const formatToken = token.toUpperCase();
       const poolsData = await this.getAllStablePools();
       const tokenPoolsData = poolsData.filter((pool) => {
         const { token1, token2 } = pool;
 
+        const includesMatch =
+          token1.includes(formatToken) || token2.includes(formatToken);
+
         const tokenMatch =
           token1.toUpperCase() === formatToken ||
           token2.toUpperCase() === formatToken;
-        return tokenMatch;
+        return tokenMatch || includesMatch;
       });
       return tokenPoolsData;
     } catch (error) {
