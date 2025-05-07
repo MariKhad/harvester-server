@@ -20,6 +20,13 @@ export class NaviController {
 
   @ApiOperation({ summary: 'Show all Navi pools' })
   @Get('pools')
+  @ApiParam({
+    name: 'token',
+    type: 'string',
+    description: 'search',
+    example: 'btc',
+    required: false,
+  })
   async getFormatPools(@Query('search') search: string) {
     return await this.naviService.getAllFormatPools(search);
   }
@@ -46,7 +53,7 @@ export class NaviController {
   }
 
   //! Не работает
-  @ApiOperation({ summary: 'Show all Navi tokens' })
+  @ApiOperation({ summary: 'Show all Navi tokens, temporary not working' })
   @Get('tokens')
   async getTokens() {
     return await this.naviService.getAllTokens();

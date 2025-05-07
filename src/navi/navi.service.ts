@@ -66,7 +66,7 @@ export class NaviService {
     }
   }
 
-  async getAllStablePoolsByToken(token: string): Promise<string | any> {
+  async getAllStablePoolsByToken(token: string): Promise<any> {
     try {
       const formatToken = token.toUpperCase();
       const poolsData = this.getAllStablePools();
