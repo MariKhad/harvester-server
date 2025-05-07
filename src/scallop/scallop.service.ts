@@ -68,30 +68,8 @@ export class ScallopService {
         data = cashData;
       }
 
-      const formatData: IFormatPool[] = [];
-      if (data && data.pools) {
-        for (const poolName in data.pools) {
-          if (data.pools.hasOwnProperty(poolName)) {
-            const pool = data.pools[poolName];
-            const formatPool: IFormatPool = {
-              pool_id: null, // Use poolId as the ID
-              token1: pool.symbol,
-              token2: null,
-              total_apr: pool.supplyApr,
-              reward1: null,
-              reward2: null,
-              reward1_apr: null,
-              reward2_apr: null,
-              protocol: 'scallop',
-              type: 'lending',
-              tvl: pool.supplyAmount,
-              volume_24: '',
-              fees_24: '',
-            };
-            formatData.push(formatPool);
-          }
-        }
-      }
+      const formatData: IFormatPool[] = this.formatPool(data);
+
       return search ? SearchFilter(formatData, search) : formatData;
     } catch (error) {
       console.error('Error in ScallopService.getAllFormatPools():', error);
@@ -99,31 +77,8 @@ export class ScallopService {
         './src/scallop/scallop.cash.json',
       );
 
-      const formatData: IFormatPool[] = [];
-      if (cashData && cashData.pools) {
-        for (const poolName in cashData.pools) {
-          if (cashData.pools.hasOwnProperty(poolName)) {
-            const pool = cashData.pools[poolName];
-            const formatPool: IFormatPool = {
-              pool_id: null, // Use poolId as the ID
-              token1: pool.symbol,
-              token2: null,
-              total_apr: pool.supplyApr,
-              reward1: null,
-              reward2: null,
-              reward1_apr: null,
-              reward2_apr: null,
-              protocol: 'scallop',
-              type: 'lending',
-              tvl: pool.supplyAmount,
-              volume_24: '',
-              fees_24: '',
-            };
-            formatData.push(formatPool);
-          }
-        }
-        return search ? SearchFilter(formatData, search) : formatData;
-      }
+      const formatData: IFormatPool[] = this.formatPool(cashData);
+      return search ? SearchFilter(formatData, search) : formatData;
     }
   }
 
@@ -148,10 +103,6 @@ export class ScallopService {
 
   async getAllStablePoolsByToken(token: string): Promise<string | any> {
     try {
-      if (!IsTokenStable(token)) {
-        return 'This token is not supported.';
-      }
-
       const formatToken = token.toUpperCase();
       const poolsData = this.getAllStablePools();
 
@@ -189,5 +140,34 @@ export class ScallopService {
       console.error('Error in ScallopService.getUserBalance():', error);
       return [];
     }
+  }
+
+  formatPool(data: any | undefined): IFormatPool[] {
+    const formatData: IFormatPool[] = [];
+
+    if (data && data.pools) {
+      for (const poolName in data.pools) {
+        if (data.pools.hasOwnProperty(poolName)) {
+          const pool = data.pools[poolName];
+          const formatPool: IFormatPool = {
+            pool_id: null, // Use poolId as the ID
+            token1: pool.symbol,
+            token2: null,
+            total_apr: pool.supplyApr,
+            reward1: null,
+            reward2: null,
+            reward1_apr: null,
+            reward2_apr: null,
+            protocol: 'scallop',
+            type: 'lending',
+            tvl: pool.supplyAmount,
+            volume_24: '',
+            fees_24: '',
+          };
+          formatData.push(formatPool);
+        }
+      }
+    }
+    return formatData;
   }
 }

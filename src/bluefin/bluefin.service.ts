@@ -11,6 +11,7 @@ import { SearchFilter } from 'src/utils/SearchFilter';
 @Injectable()
 export class BluefinService {
   private readonly client: SuiClient;
+  private readonly wrappedCurrencies = ['SUI', 'BTC', 'ETH', 'USDC', 'SOL'];
 
   constructor(@Inject('SuiClient') client: SuiClient) {
     this.client = client;
@@ -82,7 +83,7 @@ export class BluefinService {
       const stablePoolsData = data.filter((pool) => {
         const { token1, token2 } = pool;
         const usdMatch = IsTokenStable(token1) && IsTokenStable(token2);
-        return usdMatch;
+        return usdMatch || this.isPoolStable(token1, token2);
       });
       return stablePoolsData;
     } catch (error) {
@@ -136,5 +137,12 @@ export class BluefinService {
       console.error('Error in BluefinService.getUserBalance():', error);
       return [];
     }
+  }
+
+  isPoolStable(token1: string, token2: string): boolean {
+    for (let coin of this.wrappedCurrencies) {
+      if (token1.includes(coin) && token2.includes(coin)) return true;
+    }
+    return false;
   }
 }

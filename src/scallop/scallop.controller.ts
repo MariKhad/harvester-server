@@ -43,7 +43,7 @@ export class ScallopController {
   @ApiOperation({ summary: 'Show all scallop tokens' })
   @Get('tokens')
   async getTokens() {
-    return await this.scallopService.getAllStablePools();
+    return await this.scallopService.getAllTokens();
   }
 
   @ApiOperation({ summary: 'Show user portfolio on scallop by address' })

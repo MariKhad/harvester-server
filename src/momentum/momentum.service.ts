@@ -39,13 +39,22 @@ export class MomentumService {
 
   async getAllStablePools(): Promise<any[]> {
     try {
-      const marketData = await this.getAllFormatPools();
+      const marketData = await this.getAllPools();
       const stablePools = marketData.filter((pool) => {
-        const { token1, token2 } = pool;
-        const usdMatch = IsTokenStable(token1) && IsTokenStable(token2);
-        return usdMatch;
+        return pool.isStable === true;
       });
-      return stablePools;
+
+      const formatStablePools = await Promise.all(
+        stablePools.map((pool) =>
+          this.processPool(
+            pool,
+            this.rewardCoin.bind(this),
+            this.getTokenByTicker.bind(this),
+          ),
+        ),
+      );
+
+      return formatStablePools;
     } catch (error) {
       console.error('Error in MomentumService.getAllPools():', error);
       return [];
@@ -115,13 +124,14 @@ export class MomentumService {
     getTokenByTicker: (ticker: string) => Promise<any>,
   ): Promise<Pool> {
     let reward1: IReward = {};
+
     let reward2: IReward = {};
 
     if (pool.rewarders && pool.rewarders[0]) {
       const reward1_name = rewardCoin(pool.rewarders[0]?.coin_type);
       const reward1_token = await getTokenByTicker(reward1_name);
       reward1.decimals = reward1_token[0]?.decimals;
-      reward1.apr = reward1.decimals ? pool.aprBreakdown.rewards[0].apr : null;
+      reward1.apr = reward1.decimals ? pool.aprBreakdown.rewards[0]?.apr : null;
       reward1.hasEnded = pool.rewarders[0].hasEnded;
       reward1.name = reward1_name;
     }
@@ -130,7 +140,7 @@ export class MomentumService {
       const reward2_name = rewardCoin(pool.rewarders[1]?.coin_type);
       const reward2_token = await getTokenByTicker(reward2_name);
       reward2.decimals = reward2_token[0]?.decimals;
-      reward2.apr = reward2.decimals ? pool.aprBreakdown.rewards[1].apr : null;
+      reward2.apr = reward2.decimals ? pool.aprBreakdown.rewards[1]?.apr : null;
       reward2.hasEnded = pool.rewarders[1].hasEnded;
       reward2.name = reward2_name;
     }
