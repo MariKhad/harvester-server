@@ -4,9 +4,10 @@ import { ScallopModule } from 'src/scallop/scallop.module';
 import { MomentumModule } from 'src/momentum/momentum.module';
 import { StablesController } from './stables.controller';
 import { StablesService } from './stables.service';
+import { NaviModule } from 'src/navi/navi.module';
 
 @Module({
-  imports: [BluefinModule, MomentumModule, ScallopModule],
+  imports: [BluefinModule, MomentumModule, ScallopModule, NaviModule],
   controllers: [StablesController],
   providers: [StablesService],
 })

@@ -28,17 +28,4 @@ export class AppService {
       navi: { ...naviPools },
     };
   }
-
-  async getAllStablePools(): Promise<any> {
-    const bluefinPools = await this.bluefinService.getAllStablePools();
-    const scallopPools = await this.scallopService.getAllStablePools();
-    const momentumPools = await this.momentumService.getAllStablePools();
-    const naviPools = await this.naviService.getAllStablePools();
-    return {
-      scallop: { ...scallopPools },
-      mometum: { ...momentumPools },
-      bluefin: { ...bluefinPools },
-      navi: { ...naviPools },
-    };
-  }
 }

@@ -8,7 +8,13 @@ import { StablesModule } from './stables/stables.module';
 import { NaviModule } from './navi/navi.module';
 
 @Module({
-  imports: [BluefinModule, MomentumModule, ScallopModule, StablesModule, NaviModule],
+  imports: [
+    BluefinModule,
+    MomentumModule,
+    ScallopModule,
+    StablesModule,
+    NaviModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

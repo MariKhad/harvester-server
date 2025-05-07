@@ -68,9 +68,6 @@ export class NaviService {
 
   async getAllStablePoolsByToken(token: string): Promise<string | any> {
     try {
-      if (!IsTokenStable(token)) {
-        return 'This token is not supported.';
-      }
       const formatToken = token.toUpperCase();
       const poolsData = this.getAllStablePools();
       const tokenPoolsData = (await poolsData).filter((pool) => {
@@ -94,20 +91,6 @@ export class NaviService {
       return [];
     }
   }
-
-  /*  async getTokenByTicker(ticker: string): Promise<[]> {
-    try {
-      const marketData = await this.mmtSDK.Pool.getAllTokens();
-      const result = marketData.filter((token) => {
-        return token.ticker === ticker;
-      });
-
-      return result;
-    } catch (error) {
-      console.error('Error in NaviService.getAllTokens():', error);
-      return [];
-    }
-  } */
 
   async getUserBalance(address: string): Promise<any> {
     try {

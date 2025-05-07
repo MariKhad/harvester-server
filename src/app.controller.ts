@@ -19,11 +19,4 @@ export class AppController {
     const pools = await this.appService.getAllFormatPools(search);
     return pools;
   }
-
-  @ApiOperation({ summary: 'Show all stable pools' })
-  @Get('/stables')
-  async getAllStablePools(): Promise<any> {
-    const pools = await this.appService.getAllStablePools();
-    return pools;
-  }
 }
