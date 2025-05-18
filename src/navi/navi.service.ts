@@ -94,7 +94,8 @@ export class NaviService {
 
   async getUserBalance(address: string): Promise<any> {
     try {
-      const balance = await this.account.getNAVIPortfolio(address);
+      const balance = await this.account.getNAVIPortfolio(address, true);
+      console.log('balance: ', balance);
       return balance;
     } catch (error) {
       console.error('Error in NaviService.getUserBalance():', error);

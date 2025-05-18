@@ -149,22 +149,25 @@ export class ScallopService {
       for (const poolName in data.pools) {
         if (data.pools.hasOwnProperty(poolName)) {
           const pool = data.pools[poolName];
-          const formatPool: IFormatPool = {
-            pool_id: null, // Use poolId as the ID
-            token1: pool.symbol,
-            token2: null,
-            total_apr: pool.supplyApr,
-            reward1: null,
-            reward2: null,
-            reward1_apr: null,
-            reward2_apr: null,
-            protocol: 'scallop',
-            type: 'lending',
-            tvl: pool.supplyAmount,
-            volume_24: '',
-            fees_24: '',
-          };
-          formatData.push(formatPool);
+          if (pool.maxSupplyCoin > 0 && pool.maxBorrowCoin > 0) {
+            const formatPool: IFormatPool = {
+              pool_id: null, // Use poolId as the ID
+              token1: pool.symbol,
+              token2: null,
+              total_apr: pool.supplyApr,
+              reward1: null,
+              reward2: null,
+              reward1_apr: null,
+              reward2_apr: null,
+              protocol: 'scallop',
+              type: 'lending',
+              tvl: pool.supplyAmount,
+              volume_24: '',
+              fees_24: '',
+            };
+
+            formatData.push(formatPool);
+          }
         }
       }
     }
