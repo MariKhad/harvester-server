@@ -7,6 +7,11 @@ import { SuiClient } from '@firefly-exchange/library-sui';
 import IsTokenStable from 'src/utils/IsTokenStable';
 import IFormatPool from 'src/struct/IFormatPool';
 import { SearchFilter } from 'src/utils/SearchFilter';
+import {
+  TickMath,
+  ClmmPoolUtil,
+} from '@firefly-exchange/library-sui/dist/src/spot/clmm';
+import { BN } from 'bn.js';
 
 @Injectable()
 export class BluefinService {
@@ -128,15 +133,62 @@ export class BluefinService {
       return [];
     }
   }
-  async getUserBalance(address: string): Promise<any[]> {
+  async getUserBalance(address: string): Promise<any> {
     try {
       const qc = new QueryChain(this.client);
-      const balance = await qc.getUserPositions(mainnet.BasePackage, address);
-      return balance;
+      const positions = await qc.getUserPositions(mainnet.BasePackage, address);
+      const formatPos: any[] = [];
+
+      for (const pos of positions) {
+        const amounts = await this.getCoinAmountsFromPositionID(
+          pos.position_id,
+          qc,
+        );
+
+        const pool = await qc.getPool(pos.pool_id);
+        const [coinA, coinB] = pool.name.split('-');
+        const decimalsA = pool.coin_a.decimals;
+        const decimalsB = pool.coin_b.decimals;
+
+        const { coinAAmount, coinBAmount } = amounts;
+
+        formatPos.push({
+          coinA: {
+            name: coinA,
+            amount: Number(coinAAmount) / Math.pow(10, decimalsA),
+          },
+          coinB: {
+            name: coinB,
+            amount: Number(coinBAmount) / Math.pow(10, decimalsB),
+          },
+        });
+      }
+      return formatPos;
     } catch (error) {
       console.error('Error in BluefinService.getUserBalance():', error);
       return [];
     }
+  }
+
+  async getCoinAmountsFromPositionID(posID: string, qc) {
+    let pos = await qc.getPositionDetails(posID);
+    let pool = await qc.getPool(pos.pool_id);
+
+    let lowerSqrtPrice = TickMath.tickIndexToSqrtPriceX64(pos.lower_tick);
+    let upperSqrtPrice = TickMath.tickIndexToSqrtPriceX64(pos.upper_tick);
+
+    const coinAmounts = ClmmPoolUtil.getCoinAmountFromLiquidity(
+      new BN(pos.liquidity),
+      new BN(pool.current_sqrt_price),
+      lowerSqrtPrice,
+      upperSqrtPrice,
+      false,
+    );
+
+    return {
+      coinAAmount: coinAmounts.coinA.toString(),
+      coinBAmount: coinAmounts.coinB.toString(),
+    };
   }
 
   isPoolStable(token1: string, token2: string): boolean {
