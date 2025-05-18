@@ -71,6 +71,9 @@ export class NaviController {
     required: false,
   })
   async getUserBalance(@Param('address') address: string) {
-    return await this.naviService.getUserBalance(address);
+    const result = await this.naviService.getUserBalance(address);
+    
+
+    return result;
   }
 }

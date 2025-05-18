@@ -94,9 +94,26 @@ export class NaviService {
 
   async getUserBalance(address: string): Promise<any> {
     try {
-      const balance = await this.account.getNAVIPortfolio(address, true);
-      console.log('balance: ', balance);
-      return balance;
+      const result = await this.account.getNAVIPortfolio(address, true);
+      const divisor = Math.pow(10, 9);
+      const data: {
+        [key: string]: { borrowBalance: number; supplyBalance: number };
+      } = Object.fromEntries(result);
+      const filteredData = Object.fromEntries(
+        Object.entries(data)
+          .filter(
+            ([key, value]) =>
+              value.supplyBalance > 0 || value.borrowBalance > 0,
+          )
+          .map(([key, value]) => [
+            key,
+            {
+              borrowBalance: value.borrowBalance / divisor,
+              supplyBalance: value.supplyBalance / divisor,
+            },
+          ]),
+      );
+      return filteredData;
     } catch (error) {
       console.error('Error in NaviService.getUserBalance():', error);
       return {};
